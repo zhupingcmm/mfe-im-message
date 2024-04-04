@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@ant-design/pro-chat": "^1.12.2",
+    "@bentwnghk/chat": "^1.25.3",
+    "@chatui/core": "^2.4.2",
+    "@sendbird/uikit-react": "^3.13.4",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -10,11 +14,21 @@
     "@types/node": "^16.18.93",
     "@types/react": "^18.2.73",
     "@types/react-dom": "^18.2.23",
+    "@types/uuid": "^9.0.8",
+    "antd": "^5.16.0",
+    "antd-style": "^3.6.2",
+    "chat": "^1.0.8",
+    "install": "^0.13.0",
+    "prismarine-chat": "^1.10.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-jwchat": "^1.5.1",
     "react-scripts": "5.0.1",
+    "react-use-websocket": "^4.8.1",
     "typescript": "^4.9.5",
-    "web-vitals": "^2.1.4"
+    "uuid": "^9.0.1",
+    "web-vitals": "^2.1.4",
+    "ws": "^8.16.0"
   },
   "scripts": {
     "start": "react-scripts start",
