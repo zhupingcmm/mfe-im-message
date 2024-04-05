@@ -36,3 +36,26 @@
     transform: rotate(360deg);
   }
 }
+
+
+.menu-demo {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 40px;
+  background-color: var(--color-neutral-2);
+}
+
+.menu-demo .arco-menu-inner {
+  overflow-y: auto;
+}
+
+.logout {
+  padding: 24px;
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+}
+
+.app {
+  padding: 24px;
+}

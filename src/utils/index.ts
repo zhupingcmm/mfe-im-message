@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { LoginPack, RequestBodyPack } from '../types';
-import { SendMessage } from 'react-use-websocket';
+import { SendMessage, ReadyState } from 'react-use-websocket';
 
 export const stringToBinaryData = (str: string) => {
     const encoder = new TextEncoder();
@@ -43,6 +43,10 @@ export const getLoginData = (loginpack: LoginPack): Uint8Array => {
 
 export const getPingData = () => {
     return getRequestData(0x270f, {});
+}
+
+export const getLogoutData = () => {
+    return getRequestData(0x232b, {});
 }
 
 
@@ -110,4 +114,21 @@ export const handleBlobData = async<T>(lastMessage: MessageEvent<any>) : Promise
 
   export const ping = (sendMessage: SendMessage): void => {
     sendMessage(getPingData());
+  }
+
+  export const logout = (sendMessage: SendMessage): void => {
+    sendMessage(getLogoutData());
+  }
+
+
+  export const getConnenctionStatus = (readyState: ReadyState) => {
+    const connectionStatus = {
+        [ReadyState.CONNECTING]: 'processing',
+        [ReadyState.OPEN]: 'success',
+        [ReadyState.CLOSING]: 'error',
+        [ReadyState.CLOSED]: 'default',
+        [ReadyState.UNINSTANTIATED]: 'error',
+      }[readyState];
+
+      return connectionStatus as 'default' | 'processing' | 'success' | 'warning' | 'error';
   }
