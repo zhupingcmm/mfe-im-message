@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { LoginPack, RequestBodyPack } from '../types';
+import { ConnectionStatus, LoginPack, RequestBodyPack } from '../types';
 import { SendMessage, ReadyState } from 'react-use-websocket';
 
 export const stringToBinaryData = (str: string) => {
@@ -130,5 +130,5 @@ export const handleBlobData = async<T>(lastMessage: MessageEvent<any>) : Promise
         [ReadyState.UNINSTANTIATED]: 'error',
       }[readyState];
 
-      return connectionStatus as 'default' | 'processing' | 'success' | 'warning' | 'error';
+      return connectionStatus as ConnectionStatus;
   }

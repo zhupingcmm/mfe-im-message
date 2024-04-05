@@ -36,3 +36,5 @@ export interface ChatPack {
 export interface RequestBodyPack {
 
 }
+
+ export type ConnectionStatus = 'default' | 'processing' | 'success' | 'warning' | 'error'
