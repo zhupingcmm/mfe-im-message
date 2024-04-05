@@ -1,4 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
+import { LoginPack, RequestBodyPack } from '../types';
+import { SendMessage } from 'react-use-websocket';
 
 export const stringToBinaryData = (str: string) => {
     const encoder = new TextEncoder();
@@ -35,9 +37,18 @@ export const getBaseData = () => {
     return {versionBytes, messageTypeBytes, clientTypeBytes , appidBytes, imeiLenghtBytes, imeiBytes};
 }
 
-export const getLoginData = (userid: string) => {
-    const conmandBytes = toBytes(0x2328);
-    const bodyBytes = stringToBinaryData(JSON.stringify({userid}));
+export const getLoginData = (loginpack: LoginPack): Uint8Array => {
+    return getRequestData(0x2328, loginpack);
+}
+
+export const getPingData = () => {
+    return getRequestData(0x270f, {});
+}
+
+
+export const getRequestData = (command: number, body: RequestBodyPack): Uint8Array => {
+    const conmandBytes = toBytes(command);
+    const bodyBytes = stringToBinaryData(JSON.stringify(body));
     const bodyLengthBytes = toBytes(bodyBytes.length);
 
     const {versionBytes, messageTypeBytes, clientTypeBytes , appidBytes, imeiLenghtBytes, imeiBytes} = getBaseData();
@@ -70,3 +81,33 @@ export const getLoginData = (userid: string) => {
 
     return combinedArray;
 }
+
+
+
+export const handleBlobData = async<T>(lastMessage: MessageEvent<any>) : Promise<T>=> {
+    const blob = lastMessage.data;
+    const reader = new FileReader();
+    const readAsTextPromise = new Promise((resolve, reject) => {
+        reader.onload = () => {
+            resolve(reader.result); // 包含解析后的数据的字符串
+        };
+        reader.onerror = reject;
+    });
+
+    reader.readAsText(blob); // 将Blob对象转换为文本
+    const result: any = await readAsTextPromise;
+    // const jsonData = JSON.parse(result); // 解析为 JSON 对象
+    console.log(result);
+    // 现在您可以在此处使用解析后的 JSON 数据
+    return JSON.parse( result) as T;
+  };
+
+
+
+  export const login = (user: LoginPack, sendMessage: SendMessage): void => {
+    sendMessage(getLoginData(user));
+  }
+
+  export const ping = (sendMessage: SendMessage): void => {
+    sendMessage(getPingData());
+  }

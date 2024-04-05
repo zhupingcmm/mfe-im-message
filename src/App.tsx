@@ -5,7 +5,8 @@ import DisplayWrapper from "./DisplayWrapper";
 import { ContactList, Chat } from 'react-jwchat'
 import { contactList } from './displayData'
 import useWebSocket, { ReadyState } from 'react-use-websocket';
-import { getLoginData } from './utils';
+import { handleBlobData, login, ping } from './utils';
+import { ChatPack, MessagePack } from './types';
 
 
 
@@ -14,62 +15,48 @@ import { getLoginData } from './utils';
 function App() {
   const [chatListData, setChatListData] = useState<any[]>([]);
   //Public API that will echo messages sent to it back to the client
-  const [socketUrl, setSocketUrl] = useState('ws://localhost:19000/ws');
-  const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
+  const [messageHistory, setMessageHistory] = useState<MessagePack<ChatPack>[]>([]);
 
-  const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
-
-//   const handleBlobData = async (lastMessage: MessageEvent<any>) => {
-//     const blob = lastMessage.data;
-//     const reader = new FileReader();
-//     const readAsTextPromise = new Promise((resolve, reject) => {
-//         reader.onload = () => {
-//             resolve(reader.result); // 包含解析后的数据的字符串
-//         };
-//         reader.onerror = reject;
-//     });
-
-//     reader.readAsText(blob); // 将Blob对象转换为文本
-//     const result = await readAsTextPromise;
-//     // const jsonData = JSON.parse(result); // 解析为 JSON 对象
-//     console.log(result);
-//     // 现在您可以在此处使用解析后的 JSON 数据
-// };
-
-  const handleBlobData = async (lastMessage: MessageEvent<any>) => {
-    const blob = lastMessage.data;
-    const reader = new FileReader();
-    const readAsTextPromise = new Promise((resolve, reject) => {
-        reader.onload = () => {
-            resolve(reader.result); // 包含解析后的数据的字符串
-        };
-        reader.onerror = reject;
-    });
-
-    reader.readAsText(blob); // 将Blob对象转换为文本
-    const result: any = await readAsTextPromise;
-    // const jsonData = JSON.parse(result); // 解析为 JSON 对象
-    console.log(result);
-    // 现在您可以在此处使用解析后的 JSON 数据
-    return JSON.parse( result);
-  };
-  useEffect(() => {
-    if (lastMessage !== null) {
-      if (lastMessage.data instanceof Blob) {
-        handleBlobData(lastMessage);
-      } else {
-        setMessageHistory((prev) => prev.concat(lastMessage));
-      }
-      
+  const { sendMessage, lastMessage, readyState } = useWebSocket('ws://localhost:19000/ws', {
+    onOpen: (event) => {
+      console.log('onOpen', event)
+    },
+    onMessage: (event: WebSocketEventMap['message']) => {
+      console.log('bbbbbbbbb', event)
     }
+  });
+
+
+
+  useEffect(() => {
+    // login
+    login({userid: '123'}, sendMessage);
+
+    const intervalId = setInterval(() => {
+      ping(sendMessage);
+    }, 2000);
+    return () => {
+      clearInterval(intervalId);
+    }
+  }, [])
+
+  useEffect(() => {
+    (async () => {
+      if (lastMessage !== null) {
+        if (lastMessage.data instanceof Blob) {
+          const message = await handleBlobData<MessagePack<ChatPack>>(lastMessage);
+          console.log('message', message);
+          if (message.command === '') {
+            setMessageHistory(pre => pre.concat(message));
+          }
+        }
+      }
+    })();
   }, [lastMessage]);
 
-  const handleClickChangeSocketUrl = useCallback(
-    () => setSocketUrl('wss://localhost:19000/ws'),
-    []
-  );
 
-  const handleClickSendMessage = useCallback(() => sendMessage(getLoginData('123')), [sendMessage]);
+
+  // const handleClickSendMessage = useCallback(() => sendMessage(getLoginData('123')), [sendMessage]);
 
   const connectionStatus = {
     [ReadyState.CONNECTING]: 'Connecting',
@@ -85,11 +72,11 @@ function App() {
   return (
     <DisplayWrapper>
       <div>
-        <button onClick={handleClickChangeSocketUrl}>
+        {/* <button onClick={handleClickChangeSocketUrl}>
           Click Me to change Socket Url
-        </button>
+        </button> */}
         <button
-          onClick={handleClickSendMessage}
+          // onClick={handleClickSendMessage}
           disabled={readyState !== ReadyState.OPEN}
         >
           Click Me to send 'Hello'
