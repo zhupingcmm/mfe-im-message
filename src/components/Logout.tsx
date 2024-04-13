@@ -39,6 +39,5 @@ export const Logout = (props: LogoutProps) => {
                 </ButtonGroup>
             </Space>
         </div>
-
     )
 }

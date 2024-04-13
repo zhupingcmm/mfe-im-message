@@ -22,7 +22,9 @@ export interface MessagePack<T> {
 }
 
 export interface LoginPack  extends RequestBodyPack{
-    userid: string;
+    userid?: string;
+    username?: string;
+    password?: string;
 }
 
 export interface ReponsePack {
@@ -36,5 +38,18 @@ export interface ChatPack {
 export interface RequestBodyPack {
 
 }
+
+export interface UserInfo {
+    username: string;
+    pssword: string;
+    userid?: string;
+}
+
+export interface ApiResponse<T> {
+    data: T | null;
+    loading: boolean;
+    error: Error | null;
+    fetchData: (url: string) => void
+  }
 
  export type ConnectionStatus = 'default' | 'processing' | 'success' | 'warning' | 'error'

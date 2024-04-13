@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import './App.css';
-import '@arco-design/web-react/dist/css/arco.css';
 import { contact, my } from "./displayData";
 import DisplayWrapper from "./DisplayWrapper";
 import { ContactList, Chat } from 'react-jwchat'
 import { contactList } from './displayData'
-import useWebSocket, { ReadyState } from 'react-use-websocket';
+import useWebSocket from 'react-use-websocket';
 import { handleBlobData, login, ping } from './utils';
 import { ChatPack, MessagePack } from './types';
 import { Logout } from './components/Logout';
@@ -57,24 +56,11 @@ function App() {
     })();
   }, [lastMessage]);
 
-
-  const connectionStatus = {
-    [ReadyState.CONNECTING]: 'Connecting',
-    [ReadyState.OPEN]: 'Open',
-    [ReadyState.CLOSING]: 'Closing',
-    [ReadyState.CLOSED]: 'Closed',
-    [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
-  }[readyState];
-
-  console.log('messageHistory', messageHistory)
-  console.log('lastMessage', lastMessage)
-
   return (
     <div className='app'>
-      <Sidebar/>
-      <Logout sendMessage = {sendMessage} readyState ={readyState}/>
+      <Logout sendMessage={sendMessage} readyState={readyState} />
       <DisplayWrapper>
-   
+
         <ContactList
           data={contactList}
           style={{
