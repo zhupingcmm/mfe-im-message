@@ -8,16 +8,25 @@ import useWebSocket from 'react-use-websocket';
 import { handleBlobData, login, ping } from './utils';
 import { ChatPack, MessagePack } from './types';
 import { Logout } from './components/Logout';
-import { Sidebar } from './components/Sidebar';
-
+import { RootState } from './store';
+import { useSelector } from 'react-redux';
+import {
+  createBrowserRouter,
+  redirect,
+  useActionData,
+  redirectDocument,
+  useNavigate
+} from "react-router-dom";
 
 
 
 
 function App() {
   const [chatListData, setChatListData] = useState<any[]>([]);
+  const userInfo = useSelector((state: RootState) => state.user);
   //Public API that will echo messages sent to it back to the client
   const [messageHistory, setMessageHistory] = useState<MessagePack<ChatPack>[]>([]);
+  const navigate = useNavigate();
 
   const { sendMessage, lastMessage, readyState } = useWebSocket('ws://localhost:19000/ws', {
     onOpen: (event) => {
@@ -28,39 +37,43 @@ function App() {
     }
   });
 
-
-
   useEffect(() => {
-    // login
-    login({ userid: '123' }, sendMessage);
-
-    const intervalId = setInterval(() => {
-      ping(sendMessage);
-    }, 2000);
-    return () => {
-      clearInterval(intervalId);
+    if (userInfo.error || userInfo.loading || !userInfo.user) {
+      navigate("/login")
     }
-  }, [])
+  }, [userInfo]);
 
-  useEffect(() => {
-    (async () => {
-      if (lastMessage !== null) {
-        if (lastMessage.data instanceof Blob) {
-          const message = await handleBlobData<MessagePack<ChatPack>>(lastMessage);
-          console.log('message', message);
-          if (message.command === '') {
-            setMessageHistory(pre => pre.concat(message));
-          }
-        }
-      }
-    })();
-  }, [lastMessage]);
+
+  // useEffect(() => {
+  //   // login
+  //   login({ userid: '123' }, sendMessage);
+
+  //   const intervalId = setInterval(() => {
+  //     ping(sendMessage);
+  //   }, 2000);
+  //   return () => {
+  //     clearInterval(intervalId);
+  //   }
+  // }, [])
+
+  // useEffect(() => {
+  //   (async () => {
+  //     if (lastMessage !== null) {
+  //       if (lastMessage.data instanceof Blob) {
+  //         const message = await handleBlobData<MessagePack<ChatPack>>(lastMessage);
+  //         console.log('message', message);
+  //         if (message.command === '') {
+  //           setMessageHistory(pre => pre.concat(message));
+  //         }
+  //       }
+  //     }
+  //   })();
+  // }, [lastMessage]);
 
   return (
     <div className='app'>
       <Logout sendMessage={sendMessage} readyState={readyState} />
       <DisplayWrapper>
-
         <ContactList
           data={contactList}
           style={{

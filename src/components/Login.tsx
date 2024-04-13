@@ -1,21 +1,30 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Form, Input, Button, Checkbox, Card } from '@arco-design/web-react';
-import { useBackendApi } from '../hooks';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { LoginPack } from '../types';
 import { loginRequestAction } from '../action/userAction';
+import { RootState } from '../store';
+import { useNavigate } from 'react-router-dom';
 
 
 const Login = () => {
     const [user, setUser] = useState<LoginPack>();
     const [remember, setRemember] = useState<boolean>(false);
-    const { data, loading, error, fetchData } = useBackendApi();
     const dispacth = useDispatch();
-
+    const navigate = useNavigate();
     const handleSubmit = useCallback(() => {
-       return dispacth(loginRequestAction(user || {}));
+        dispacth(loginRequestAction(user || {}));
     }, [user]);
 
+    const userInfo = useSelector((state: RootState) => state.user);
+
+    console.log('userinfo', userInfo)
+
+    useEffect(() => {
+        if (!userInfo.error && !userInfo.loading && userInfo.user) {
+            navigate('/');
+        }
+    }, [userInfo]);
 
     return (
         <div>
