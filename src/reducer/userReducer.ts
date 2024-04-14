@@ -1,8 +1,9 @@
-import { LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE } from '../action/userAction';
+import { LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE, LOGIN_OUT } from '../action/userAction';
+import { UserInfo } from '../types';
 
 // store/reducer.ts
 export interface UserState {
-  user: any;
+  user: UserInfo | null;
   loading: boolean;
   error: string | null;
 }
@@ -33,6 +34,12 @@ export const userReducer = (state = initialState, action: any): UserState => {
         loading: false,
         error: action.payload,
       };
+    case LOGIN_OUT:
+      return {
+        ... state,
+        loading: false,
+        user: null
+      }
     default:
       return state;
   }

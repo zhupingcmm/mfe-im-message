@@ -11,10 +11,6 @@ import { Logout } from './components/Logout';
 import { RootState } from './store';
 import { useSelector } from 'react-redux';
 import {
-  createBrowserRouter,
-  redirect,
-  useActionData,
-  redirectDocument,
   useNavigate
 } from "react-router-dom";
 
@@ -38,37 +34,36 @@ function App() {
   });
 
   useEffect(() => {
+    let intervalId:  NodeJS.Timer;
     if (userInfo.error || userInfo.loading || !userInfo.user) {
       navigate("/login")
+    } else {
+       // login
+      login({ userid: userInfo.user.userid }, sendMessage);
+
+      intervalId = setInterval(() => {
+        ping(sendMessage);
+      }, 2000);
+      
+    }
+    return () => {
+      clearInterval(intervalId);
     }
   }, [userInfo]);
 
-
-  // useEffect(() => {
-  //   // login
-  //   login({ userid: '123' }, sendMessage);
-
-  //   const intervalId = setInterval(() => {
-  //     ping(sendMessage);
-  //   }, 2000);
-  //   return () => {
-  //     clearInterval(intervalId);
-  //   }
-  // }, [])
-
-  // useEffect(() => {
-  //   (async () => {
-  //     if (lastMessage !== null) {
-  //       if (lastMessage.data instanceof Blob) {
-  //         const message = await handleBlobData<MessagePack<ChatPack>>(lastMessage);
-  //         console.log('message', message);
-  //         if (message.command === '') {
-  //           setMessageHistory(pre => pre.concat(message));
-  //         }
-  //       }
-  //     }
-  //   })();
-  // }, [lastMessage]);
+  useEffect(() => {
+    (async () => {
+      if (lastMessage !== null) {
+        if (lastMessage.data instanceof Blob) {
+          const message = await handleBlobData<MessagePack<ChatPack>>(lastMessage);
+          console.log('message', message);
+          if (message.command === '') {
+            setMessageHistory(pre => pre.concat(message));
+          }
+        }
+      }
+    })();
+  }, [lastMessage]);
 
   return (
     <div className='app'>

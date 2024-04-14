@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Button, Space, Popover, Badge, Typography } from '@arco-design/web-react';
 import { SendMessage, ReadyState } from 'react-use-websocket';
 import {
     IconMore,
 } from '@arco-design/web-react/icon';
 import { getConnenctionStatus, logout } from '../utils';
+import { useDispatch } from 'react-redux';
+import { logoutAction } from '../action/userAction';
 
 const ButtonGroup = Button.Group;
 
@@ -15,6 +17,17 @@ interface LogoutProps {
 
 export const Logout = (props: LogoutProps) => {
     const { sendMessage, readyState } = props;
+    const dispatch = useDispatch();
+
+    const handleLogout = useCallback(() => {
+
+        // logout from ws
+        logout(sendMessage);
+
+        // remove userinfo
+        dispatch(logoutAction())
+    }, [sendMessage]);
+    
     return (
         <div className='logout'>
             <Space >
@@ -30,7 +43,7 @@ export const Logout = (props: LogoutProps) => {
 
                     <Popover content={
                         <Space direction='vertical'>
-                            <Button type='text' onClick={() => logout(sendMessage)}> 登出</Button>
+                            <Button type='text' onClick={handleLogout}> 登出</Button>
                             <Button type='text'> 切换用户</Button>
                         </Space>
                     }>
